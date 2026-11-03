@@ -25,7 +25,7 @@ Pushes to `main` publish the `latest` tag and a commit-specific `sha-...` tag. V
 
 5. Open `http://UNRAID_ADDRESS:8080`. Set `LOGTASTIQ_PORT` in `.env` to use a different host port. SQLite data is stored under `/mnt/user/appdata/logtastiq/data` by default and remains across container updates; override `LOGTASTIQ_DATA_PATH` if you choose a different path.
 
-To enable automatic updates, configure a scheduled image pull/update for this stack in Compose Manager Plus. It will pull the latest main images and recreate the containers on its schedule, causing a short restart. For a reproducible deployment, set both image variables in `.env` to the same `sha-<full Git SHA>` tag or release tag instead of `latest`. To roll back, restore the previous SHA image tags and redeploy. Back up the appdata directory with your other Unraid app data.
+To enable automatic updates, configure a scheduled image pull/update for this stack in Compose Manager Plus. It will pull the latest main images and recreate the containers on its schedule, causing a short restart. For a reproducible deployment, set both image variables in `.env` to the same `sha-<full Git SHA>` tag or release tag instead of `latest`. To roll back, restore the previous SHA image tags and redeploy. Back up the appdata directory with your other Unraid app data. If the Compose Manager project files are lost, follow [the Unraid recovery runbook](docs/UNRAID_RECOVERY.md) before recreating the stack.
 
 For a private GHCR package, log in once on Unraid before pulling:
 
