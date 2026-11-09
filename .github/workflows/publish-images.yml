@@ -27,6 +27,9 @@ jobs:
       - name: Validate Unraid Compose configuration
         run: docker compose --env-file .env.unraid.example -f docker-compose.unraid.yml config --quiet
 
+      - name: Test guarded Unraid image updater
+        run: python3 -m unittest backend.tests.test_auto_update_script -v
+
       - name: Record frontend build time
         id: build_info
         run: echo "date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"

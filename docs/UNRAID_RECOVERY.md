@@ -112,3 +112,43 @@ database, or appdata until the rollback and backup are verified.
 Record the final image digests, Compose source path, host port, data path,
 health result, and update authority in the private operations inventory. Record
 only secret names and storage paths, never secret values.
+
+## 6. Optional scheduled image updater
+
+`scripts/auto-update.sh` can be scheduled with Unraid User Scripts after the
+active Compose Manager project has been identified. It deliberately requires
+the actual Compose file(s) and private `.env` path as `LOGTASTIQ_COMPOSE_FILE`
+and `LOGTASTIQ_ENV_FILE`; set multiple Compose files as a colon-separated list
+in the same order Compose Manager uses them. Do not point it at a clean example
+stack if the live project uses an override file.
+
+The script identifies the running Logtastiq containers by their GHCR images,
+confirms they share one Compose project, and pulls both `latest` images before
+it changes either service. It requires both images to carry the same full
+`org.opencontainers.image.revision` label. It then creates a SQLite online
+backup under `/data/backups/`, applies the pair by immutable digest, and checks
+the backend health route plus frontend container state. A failed rollout
+triggers a restore using the previously running image digests. If rollback or
+its health check fails, investigate immediately and disable the schedule.
+
+Before enabling the schedule, verify that the active Compose definition has
+`backend` and `frontend` services, uses the existing `hellotherelogs.sqlite3`
+file mounted at `/data`, and accepts `LOGTASTIQ_BACKEND_IMAGE` and
+`LOGTASTIQ_FRONTEND_IMAGE` overrides. Keep the current Compose Manager project
+name, data mount, port, environment file, and any override files. Run the
+script manually once with the two paths set, review its output, then add it to
+User Scripts at a conservative interval (for example, every six hours). Keep
+the User Scripts log available for confirming each release and its recovery
+path. This repository change does not edit the Unraid schedule or files.
+
+Example User Scripts command (replace both paths with the verified live paths):
+
+```bash
+LOGTASTIQ_COMPOSE_FILE="/path/to/docker-compose.yml:/path/to/docker-compose.override.yml" \
+LOGTASTIQ_ENV_FILE="/path/to/.env" \
+bash /path/to/logtastiq/repo/scripts/auto-update.sh
+```
+
+The first run can update production containers. Confirm the current image
+revisions, backup destination, Compose project, and maintenance window before
+enabling the schedule.
