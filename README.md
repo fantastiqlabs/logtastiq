@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/fantastiqlabs/.github/main/profile/assets/fantastiq-labs-mark.svg" alt="Fantastiq Labs" width="520">
+</p>
+
 # Logtastiq
 
 **Turn Warcraft Logs into clear next steps.**
