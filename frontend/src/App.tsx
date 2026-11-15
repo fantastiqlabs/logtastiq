@@ -1,4 +1,4 @@
-import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react'
+import { createContext, FormEvent, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import './analysis.css'
 import './local-log.css'
@@ -7,12 +7,30 @@ import './long-buff.css'
 import './upload-analysis.css'
 import './debuff-applications.css'
 import './themes.css'
+import './branding.css'
 import './live-updates.css'
 import { changeLiveInterval, defaultSessionMinutes, isLiveSessionActive, readLiveSession, refreshIntervals, sessionDurations, startLiveSession } from './live-session'
 import { bossGuideFor, type BossGuide } from './boss-guides'
 import { Activity, ArrowLeft, ArrowUpRight, Check, CircleHelp, Clock3, ExternalLink, LoaderCircle, ScrollText, Shield, Skull, Swords, Trophy } from 'lucide-react'
 
 type Health = { status: string; service: string }
+type Brand = { portal_name: string; tagline: string; logo_url: string; primary_color: string; accent_color: string }
+type PublicConfig = { brand: Brand }
+const defaultBrand: Brand = {
+  portal_name: 'Logtastiq',
+  tagline: 'Turn Warcraft Logs into clear next steps.',
+  logo_url: '',
+  primary_color: '#f2c14e',
+  accent_color: '#e7a7c3',
+}
+const BrandContext = createContext<Brand>(defaultBrand)
+
+async function fetchPublicConfig(): Promise<PublicConfig> {
+  const response = await fetch('/api/config')
+  if (!response.ok) throw new Error('Public app configuration unavailable')
+  return response.json()
+}
+
 type Fight = {
   fight_id: number
   encounter_id: number
@@ -447,10 +465,11 @@ function AppearanceControls() {
 }
 
 function Header({ connected }: { connected?: boolean }) {
+  const brand = useContext(BrandContext)
   const buildDate = import.meta.env.VITE_APP_BUILD_DATE || 'local build'
   const buildDateLabel = buildDate.length >= 16 ? `${buildDate.slice(0, 10)} ${buildDate.slice(11, 16)} UTC` : buildDate
   return <header className="topbar">
-    <a className="brand" href="/" aria-label="Logtastiq home"><span className="brand-mark"><ScrollText size={17} /></span><span>Logtastiq</span><span className="version" title={`Built ${buildDate}`}>BUILD / {(import.meta.env.VITE_APP_VERSION || 'local').slice(0, 7)} · {buildDateLabel}</span></a>
+    <a className="brand" href="/" aria-label={`${brand.portal_name} home`}><span className="brand-mark">{brand.logo_url ? <img className="brand-logo" src={brand.logo_url} alt="" /> : <ScrollText size={17} />}</span><span className="brand-name">{brand.portal_name}</span><span className="version" title={`Built ${buildDate}`}>BUILD / {(import.meta.env.VITE_APP_VERSION || 'local').slice(0, 7)} · {buildDateLabel}</span></a>
     <div className="topbar-tools"><AppearanceControls />
     {connected !== undefined && <div className="system-status"><span className={`status-dot ${connected ? 'online' : ''}`} /> API {connected ? 'CONNECTED' : 'OFFLINE'}</div>}
     </div>
@@ -1239,10 +1258,17 @@ function Stat({ icon, label, value, tint }: { icon: ReactNode; label: string; va
 }
 
 function Footer() {
-  return <footer><span>LOGTASTIQ <span className="muted">· Turn Warcraft Logs into clear next steps.</span></span><span>WARCRAFT LOGS CREDENTIALS STAY SERVER-SIDE</span></footer>
+  const brand = useContext(BrandContext)
+  return <footer><span>{brand.portal_name.toUpperCase()} <span className="muted">· {brand.tagline}</span></span><span>WARCRAFT LOGS CREDENTIALS STAY SERVER-SIDE</span></footer>
 }
 
 export default function App() {
+  const config = useQuery({ queryKey: ['public-config'], queryFn: fetchPublicConfig, staleTime: Infinity, retry: 1 })
+  const brand = config.data?.brand ?? defaultBrand
+  useEffect(() => {
+    document.documentElement.style.setProperty('--brand-primary', brand.primary_color)
+    document.documentElement.style.setProperty('--brand-accent', brand.accent_color)
+  }, [brand.primary_color, brand.accent_color])
   const match = window.location.pathname.match(/^\/reports\/([A-Za-z0-9]+)\/?$/)
-  return match ? <ReportPage code={match[1]} /> : <HomePage />
+  return <BrandContext.Provider value={brand}>{match ? <ReportPage code={match[1]} /> : <HomePage />}</BrandContext.Provider>
 }

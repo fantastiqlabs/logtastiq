@@ -38,6 +38,7 @@ def create_app(
             engine.dispose()
 
     application = FastAPI(title=app_settings.app_name, version="0.2.0", lifespan=lifespan)
+    application.state.settings = app_settings
     application.add_middleware(
         CORSMiddleware,
         allow_origins=[app_settings.frontend_origin],

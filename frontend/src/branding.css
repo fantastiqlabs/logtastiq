@@ -1,0 +1,3 @@
+.brand-mark{color:var(--brand-primary,#f2c14e);border-color:var(--brand-primary,#f2c14e)}
+.brand-name{border-bottom:1px solid var(--brand-accent,#e7a7c3)}
+.brand-logo{width:17px;height:17px;object-fit:contain}
