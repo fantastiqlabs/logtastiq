@@ -10,6 +10,11 @@ services:
       WCL_TOKEN_URL: ${WCL_TOKEN_URL:-https://www.warcraftlogs.com/oauth/token}
       WCL_GRAPHQL_URL: ${WCL_GRAPHQL_URL:-https://fresh.warcraftlogs.com/api/v2/client}
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:8080}
+      BRAND_PORTAL_NAME: ${BRAND_PORTAL_NAME:-Logtastiq}
+      BRAND_TAGLINE: ${BRAND_TAGLINE:-Turn Warcraft Logs into clear next steps.}
+      BRAND_LOGO_URL: ${BRAND_LOGO_URL:-}
+      BRAND_PRIMARY_COLOR: ${BRAND_PRIMARY_COLOR:-#f2c14e}
+      BRAND_ACCENT_COLOR: ${BRAND_ACCENT_COLOR:-#e7a7c3}
     volumes:
       - ${LOGTASTIQ_DATA_PATH:-${HELLOTHERELOGS_DATA_PATH:-/mnt/user/appdata/logtastiq/data}}:/data
     expose:

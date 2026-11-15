@@ -83,10 +83,15 @@ Paste a Fresh URL such as `https://fresh.warcraftlogs.com/reports/REPORTCODE`, c
 | `DATABASE_URL` | SQLite URL; Compose uses the persistent volume |
 | `CACHE_TTL_SECONDS` | Normalized report/fight cache lifetime |
 | `FRONTEND_ORIGIN` | CORS origin for direct API access |
+| `BRAND_PORTAL_NAME`, `BRAND_TAGLINE` | Public name and short description shown in the header/footer |
+| `BRAND_LOGO_URL` | Optional same-origin image path or HTTPS logo URL; empty keeps the built-in icon |
+| `BRAND_PRIMARY_COLOR`, `BRAND_ACCENT_COLOR` | Public brand colors as six-digit hex values |
 | `LOGTASTIQ_PORT` | Optional nginx host port (default `8080`) |
 | `LOGTASTIQ_BIND_ADDRESS` | Host interface Docker publishes on (default `0.0.0.0`, all interfaces) |
 
 Unraid deployment uses `.env.unraid.example` and `docker-compose.unraid.yml`. `LOGTASTIQ_BACKEND_IMAGE` and `LOGTASTIQ_FRONTEND_IMAGE` can override the default GHCR `latest` tags to pin a release or commit image. Compose still accepts the former `HELLOTHERELOGS_*` variables so existing Unraid environment files keep working.
+
+Brand settings are served by the read-only `/api/config` endpoint and contain only public display values. They never include Warcraft Logs credentials. Colors must be six-digit hex values; logo URLs must use a same-origin path or HTTPS.
 
 ## Contributing
 
